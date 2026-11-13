@@ -48,6 +48,12 @@ should return approximately 0.70 (as a float)'''
 
     return numerator / (len1**0.5) / (len2**0.5)
 
+def add_semantic_descriptor(vec1: dict[str, list[str, int]], vec2: dict[str, list[str, int]]) -> dict[str, list[str, int]]:
+    pass
+
+def build_semantic_descriptor(sentence):
+    pass
+
 def build_semantic_descriptors(sentences):
     '''This function takes in a list sentences, which is a list containing lists of strings (words)
 representing sentences, and returns a dictionary d such that for every word w that appears in at
