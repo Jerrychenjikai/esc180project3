@@ -17,13 +17,36 @@ def norm(vec):
 
     return math.sqrt(sum_of_squares)
 
+def get_value(vec: dict[str, int], idx: str) -> int:
+    try:
+        return vec[idx]
+    except KeyError:
+        return 0
+
+def increase(vec: dict[str, int], idx: str, value: int = 1) -> None:
+    vec[idx] = get_value(vec, idx) + value
+
 def cosine_similarity(vec1, vec2):
     '''This function returns the cosine similarity between the sparse vectors vec1 and vec2, stored as
 dictionaries. For example,
 cosine_similarity({"a": 1, "b": 2, "c": 3},
 {"b": 4, "c": 5, "d": 6})
 should return approximately 0.70 (as a float)'''
-    pass
+    keys1 = set(vec1.keys())
+    keys2 = set(vec2.keys())
+
+    keys = keys1 & keys2
+
+    numerator = 0
+    len1 = 0
+    len2 = 0
+
+    for i in keys:
+        numerator += get_value(vec1, i) * get_value(vec2, i)
+        len1 += get_value(vec1, i) ** 2
+        len2 += get_value(vec2, i) ** 2
+
+    return numerator / (len1**0.5) / (len2**0.5)
 
 def build_semantic_descriptors(sentences):
     '''This function takes in a list sentences, which is a list containing lists of strings (words)
@@ -49,6 +72,8 @@ Computational complexity – Avoid writing this function such that its complexit
 n is the total number of words in the text. This will result in not being able to run the code once all
 the functions are complete.
 A hint for how to achieve this is at the end of this handout.'''
+
+    
     pass
 
 def build_semantic_descriptors_from_files(filenames):
