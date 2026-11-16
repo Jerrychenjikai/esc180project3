@@ -2,11 +2,12 @@
 
 Author: Michael Guerzhoy. Last modified: Nov. 20, 2023.
 '''
-
+from __future__ import annotations
+from typing import Optional
 import math
 
 
-def norm(vec):
+def norm(vec: dict[str, int]) -> float:
     '''Return the norm of a vector stored as a dictionary, as
     described in the handout for Project 3.
     '''
@@ -17,42 +18,38 @@ def norm(vec):
 
     return math.sqrt(sum_of_squares)
 
-def get_value(vec: dict[str, int], idx: str) -> int:
-    try:
-        return vec[idx]
-    except KeyError:
-        return 0
-
 def increase(vec: dict[str, int], idx: str, value: int = 1) -> None:
-    vec[idx] = get_value(vec, idx) + value
+    vec[idx] = vec.get(idx, 0) + value
 
-def cosine_similarity(vec1, vec2):
+def get_cumulative_keys(vec1: dict[str, int], vec2: dict[str, int], all = False) -> set:
+    keys1 = set(vec1.keys())
+    keys2 = set(vec2.keys())
+
+    return keys1 | keys2 if all else keys1 & keys2
+
+def cosine_similarity(vec1: dict[str, int], vec2: dict[str, int]) -> float:
     '''This function returns the cosine similarity between the sparse vectors vec1 and vec2, stored as
 dictionaries. For example,
 cosine_similarity({"a": 1, "b": 2, "c": 3},
 {"b": 4, "c": 5, "d": 6})
 should return approximately 0.70 (as a float)'''
-    keys1 = set(vec1.keys())
-    keys2 = set(vec2.keys())
-
-    keys = keys1 & keys2
+    keys = get_cumulative_keys(vec1, vec2)
 
     numerator = 0
     len1 = 0
     len2 = 0
 
     for i in keys:
-        numerator += get_value(vec1, i) * get_value(vec2, i)
-        len1 += get_value(vec1, i) ** 2
-        len2 += get_value(vec2, i) ** 2
+        numerator += vec1.get(i, 0) * vec2.get(i, 0)
+    for i in vec1.keys():
+        len1 += vec1.get(i, 0) ** 2
+    for i in vec2.keys():
+        len2 += vec2.get(i, 0) ** 2
+
+    if len1 == 0 or len2 == 0:
+        return -1
 
     return numerator / (len1**0.5) / (len2**0.5)
-
-def add_semantic_descriptor(vec1: dict[str, list[str, int]], vec2: dict[str, list[str, int]]) -> dict[str, list[str, int]]:
-    pass
-
-def build_semantic_descriptor(sentence):
-    pass
 
 def build_semantic_descriptors(sentences):
     '''This function takes in a list sentences, which is a list containing lists of strings (words)
@@ -79,8 +76,21 @@ n is the total number of words in the text. This will result in not being able t
 the functions are complete.
 A hint for how to achieve this is at the end of this handout.'''
 
-    
-    pass
+    d = {}
+
+    for sentence in sentences:
+        unique_words = set(sentence)
+        
+        for w1 in unique_words:
+            if w1 not in d:
+                d[w1] = {}
+            
+            w1_dict = d[w1]
+            for w2 in unique_words:
+                if w1 != w2:
+                    w1_dict[w2] = w1_dict.get(w2, 0) + 1
+
+    return d
 
 def build_semantic_descriptors_from_files(filenames):
     '''This function takes a list filenames containing strings, with each string containing the name of
