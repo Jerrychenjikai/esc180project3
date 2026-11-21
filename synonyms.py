@@ -102,7 +102,28 @@ You should assume that the following punctuation always separates sentences: "."
 and that is the only punctuation that can separate sentences. Assume that only the following
 additional punctuation is present in the texts: [",", "-", "--", ":", ";"]. How your
 code handles other punctuation not explicitly listed in this question is up to you.'''
-    pass
+    res_text = []
+    for filename in filenames:
+        file = open(filename, "r", encoding="latin1")
+        res_text.append(file.read())
+        file.close()
+
+    text = " ".join(res_text).lower()
+    text = text.replace(",", " ")
+    text = text.replace("-", " ")
+    text = text.replace(":", " ")
+    text = text.replace(";", " ")
+    text = text.replace("?", ".")
+    text = text.replace("!", ".")
+
+    result = []
+    for sentence in text.split("."):
+        words = sentence.split()
+        if words: #check if the len(L) is zero  Ex: ["hi world."] -> [["hi"],["world"],[" "]]
+            result.append(words)
+
+    return build_semantic_descriptors(result)
+    
 
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
     '''This function takes in a string word, a list of strings choices, and a dictionary
@@ -116,7 +137,20 @@ similarity between two words cannot be computed (e.g., a word is missing from
 semantic_descriptors, or its descriptor is empty), it is considered to be −1. In case of a tie
 between several elements in choices, the one with the smallest index should be returned (e.g.,
 if there is a tie between choices[5] and choices[7], choices[5] is returned).'''
-    pass
+    max_location = -2
+    max_score = -9999
+    for i in range(len(choices)):
+        word_vec = semantic_descriptors.get(word) #get values from key
+        choice_vec = semantic_descriptors.get(choices[i])
+        if word_vec and choice_vec: #check if there are values, no value, no length
+            score = similarity_fn(word_vec, choice_vec)
+        else:
+            score = -1
+        if score > max_score:
+            max_score = score
+            max_location = i
+
+    return choices[max_location]
 
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
     '''This function takes in a string filename which is the name of a file in the same format as
