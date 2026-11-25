@@ -166,4 +166,29 @@ feline:
 (b) cat
 (c) horse
 and indicates that the correct answer is “cat”'''
-    pass
+    with open(filename, "r", encoding="latin1") as f:
+        lines = f.readlines()
+
+    correct_count = 0
+    total_count = 0
+
+    for line in lines:
+        parts = line.strip().split()
+        if not parts:
+            continue
+        
+        word = parts[0]
+        correct_answer = parts[1]
+        choices = parts[2:]
+        
+        # 使用 most_similar_word 进行预测
+        guess = most_similar_word(word, choices, semantic_descriptors, similarity_fn)
+        
+        if guess == correct_answer:
+            correct_count += 1
+        total_count += 1
+
+    if total_count == 0:
+        return 0.0
+
+    return (correct_count / total_count) * 100.0
